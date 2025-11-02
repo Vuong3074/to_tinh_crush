@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tỏ tình 💌</title>
 <style>
+  /* ---------------- Body và font ---------------- */
   body {
     margin: 0;
-    overflow: hidden;
-    background: url('bg.png') center/cover no-repeat;
+    overflow: hidden; /* tránh scroll */
+    background: url('bg.png') center/cover no-repeat; /* nền */
     font-family: 'Poppins', sans-serif;
     height: 100vh;
     display: flex;
@@ -18,6 +19,7 @@
     color: #2e1a1a;
   }
 
+  /* ---------------- Lớp phủ mờ ---------------- */
   .overlay {
     position: fixed;
     inset: 0;
@@ -25,6 +27,7 @@
     z-index: 0;
   }
 
+  /* ---------------- Khung chính ---------------- */
   .container {
     position: relative;
     z-index: 100;
@@ -63,6 +66,7 @@
     background: linear-gradient(45deg, #ff66aa, #ff3385);
   }
 
+  /* ---------------- Khung 2 nút Đồng ý / Từ chối ---------------- */
   .btn-group {
     display: flex;
     justify-content: center;
@@ -73,6 +77,7 @@
     height: 120px;
   }
 
+  /* ---------------- Hiệu ứng emoji bay ---------------- */
   @keyframes floatUp {
     0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
     100% { transform: translateY(-120vh) rotate(360deg) scale(1.4); opacity: 0; }
@@ -81,7 +86,7 @@
   .love-item {
     position: fixed;
     bottom: -10vh;
-    pointer-events: none;
+    pointer-events: none; /* không che chuột */
     z-index: 5;
     opacity: 0.9;
   }
@@ -103,8 +108,9 @@
 </head>
 
 <body>
-  <div class="overlay"></div>
+  <div class="overlay"></div> <!-- lớp phủ mờ nền -->
 
+  <!-- Container chính -->
   <div class="container" id="content">
     <h2>Xin chào 💕, cho mình biết tên cậu nhé?</h2>
     <input type="text" id="name" placeholder="Nhập tên của cậu...">
@@ -112,6 +118,7 @@
     <button onclick="askImpression()">Gửi</button>
   </div>
 
+  <!-- Nhạc nền -->
   <audio id="bgMusic" autoplay loop>
     <source src="September.mp3" type="audio/mpeg">
     Trình duyệt của bạn không hỗ trợ phát nhạc.
@@ -122,10 +129,14 @@
   const bgMusic = document.getElementById('bgMusic');
   bgMusic.volume = 0.4;
 
+  // Cố gắng phát nhạc khi tải trang
   window.addEventListener('load', () => {
-    bgMusic.play().catch(() => { console.log("Autoplay bị chặn — chờ tương tác."); });
+    bgMusic.play().catch(() => { 
+      console.log("Autoplay bị chặn — chờ tương tác."); 
+    });
   });
 
+  // Nếu bị chặn autoplay → phát nhạc khi người dùng tương tác
   const enableMusic = () => {
     if (bgMusic.paused) bgMusic.play().then(() => console.log("Nhạc phát sau khi người dùng tương tác"));
     document.removeEventListener('click', enableMusic);
@@ -134,8 +145,11 @@
   document.addEventListener('click', enableMusic);
   document.addEventListener('keydown', enableMusic);
 
+  // ---------------- Bước 1: hỏi tên ----------------
   function askImpression() {
-    const name = "Bảo bối của tớ";
+    // -------- Thay đổi tên và màu chữ --------
+    // Có thể thay đổi giá trị "name" ở đây để hiển thị tên khác
+    const name = "Bảo bối của tớ"; // tên cố định
     container.innerHTML = `
       <h2>Tớ biết cậu tên là <span style="color:#ff3e9e">${name}</span> mà 💖</h2>
       <p>Cậu có ấn tượng gì với tớ không nè 😚</p>
@@ -143,8 +157,10 @@
       <br>
       <button onclick="showAnswer()">Gửi</button>
     `;
+    // 👆 span màu #ff3e9e có thể thay đổi màu chữ tên khác
   }
 
+  // ---------------- Bước 2: hỏi ấn tượng và hiện 2 nút ----------------
   function showAnswer() {
     container.innerHTML = `
       <h2>Tớ biết rồi 😎 — tớ đẹp trai lắm đúng không 💗</h2>
@@ -157,18 +173,33 @@
       </div>
     `;
 
-    const noBtn = document.getElementById('no');
-    const yesBtn = document.getElementById('yes');
-    let isRunning = false;
+    const noBtn = document.getElementById('no'); // nút từ chối
+    const yesBtn = document.getElementById('yes'); // nút đồng ý
+    let isRunning = false; // kiểm soát nút chạy
 
-    noBtn.addEventListener('mouseenter', () => { isRunning = true; moveButton(); });
+    // Khi hover lần đầu → bắt đầu chạy
+    noBtn.addEventListener('mouseenter', () => { 
+      isRunning = true; 
+      moveButton(); 
+    });
 
+    // Khi click → cũng chạy
+    noBtn.addEventListener('click', () => { 
+      if (isRunning) moveButton(); 
+    });
+
+    // Hover tiếp tục
+    noBtn.addEventListener('mouseover', () => { 
+      if (isRunning) moveButton(); 
+    });
+
+    // Hàm di chuyển nút từ chối
     function moveButton() {
       if (!isRunning) return;
 
       const parent = noBtn.parentElement;
-      const rect = parent.getBoundingClientRect();
-      const yesRect = yesBtn.getBoundingClientRect();
+      const rect = parent.getBoundingClientRect(); // khung chứa
+      const yesRect = yesBtn.getBoundingClientRect(); // khung nút đồng ý
       const maxX = rect.width - noBtn.offsetWidth;
       const maxY = rect.height - noBtn.offsetHeight;
       let x, y, overlap;
@@ -184,6 +215,7 @@
           bottom: rect.top + y + noBtn.offsetHeight
         };
 
+        // kiểm tra không chồng lên nút đồng ý
         overlap = !(
           noRect.right < yesRect.left - 10 ||
           noRect.left > yesRect.right + 10 ||
@@ -196,18 +228,18 @@
       noBtn.style.left = `${x}px`;
       noBtn.style.top = `${y}px`;
     }
-
-    noBtn.addEventListener('mouseover', () => { if (isRunning) moveButton(); });
   }
 
+  // ---------------- Khi đồng ý ----------------
   function acceptLove() {
     container.innerHTML = `
       <h2>Cậu đồng ý rồi 💖</h2>
       <p>Tớ sẽ yêu cậu thật nhiều 😘</p>
     `;
 
-    navigator.vibrate?.(200);
+    navigator.vibrate?.(200); // rung nhẹ nếu hỗ trợ
 
+    // Hiệu ứng tim & hoa bay ngẫu nhiên
     let waves = 0;
     const explosion = setInterval(() => {
       for (let i = 0; i < 50; i++) createLoveBurst();
@@ -216,6 +248,7 @@
     }, 200);
   }
 
+  // ---------------- Tim bay nền ----------------
   function createHeart() {
     const heart = document.createElement('div');
     heart.classList.add('heart');
@@ -223,10 +256,11 @@
     heart.style.left = Math.random() * 100 + 'vw';
     heart.style.animationDuration = (3 + Math.random() * 3) + 's';
     document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 6000);
+    setTimeout(() => heart.remove(), 6000); // xóa sau 6s
   }
   setInterval(createHeart, 500);
 
+  // ---------------- Tim & hoa bay ngẫu nhiên ----------------
   const loveEmojis = ['💖','💕','💘','💓','💗','💞','💝','🌸','🌷','🌹','🌺','🌻','✨','⭐','💫','🌼'];
   function createLoveBurst() {
     const el = document.createElement('div');
@@ -236,7 +270,7 @@
     el.style.fontSize = 20 + Math.random() * 40 + 'px';
     el.style.animation = `floatUp ${4 + Math.random() * 4}s linear forwards`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 8000);
+    setTimeout(() => el.remove(), 8000); // xóa sau 8s
   }
 </script>
 </body>
